@@ -1,0 +1,35 @@
+# AI_Stock 项目全局配置
+
+# 数据源配置
+data_source:
+  default: "tushare"  # 默认数据源: tushare / baostock
+  tushare:
+    token_file: "config/tushare_token.txt"  # TuShare Pro token 文件路径
+  baostock:
+    adjust: "3"        # 默认复权方式: 1(后复权) / 2(前复权) / 3(前复权，且采用最新财务数据)
+
+# 数据存储路径
+paths:
+  raw_daily: "data/raw/daily"
+  raw_realtime: "data/raw/realtime"
+  raw_financial: "data/raw/financial"
+  processed: "data/processed"
+  stock_pool: "data/stock_pool.csv"
+
+# 默认日期范围
+default_dates:
+  start: "2020-01-01"
+  end: "2026-12-31"
+
+# 股票池（默认关注的股票代码列表）
+stock_pool:
+  - "000001"  # 平安银行
+  - "600036"  # 招商银行
+  - "000858"  # 五粮液
+  - "601318"  # 中国平安
+  - "600519"  # 贵州茅台
+
+# 输出格式
+output:
+  format: "csv"        # 默认输出格式: csv / parquet
+  encoding: "utf-8-sig"  # CSV编码，utf-8-sig 可在Excel中正确显示中文
