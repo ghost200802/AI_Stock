@@ -20,22 +20,6 @@ env/
 *.swo
 *~
 
-# Data files (keep directory structure, ignore large data)
-data/raw/daily/*.csv
-data/raw/daily/*.parquet
-data/raw/realtime/*.csv
-data/raw/realtime/*.parquet
-data/raw/financial/*.csv
-data/raw/financial/*.parquet
-data/processed/*.csv
-data/processed/*.parquet
-data/processed/*.pkl
-
-# Output
-output/*.csv
-output/*.png
-output/*.html
-
 # Notebook checkpoints
 .ipynb_checkpoints/
 

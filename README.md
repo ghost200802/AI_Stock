@@ -91,27 +91,26 @@ AI_Stock/
 │   └── tushare_token.txt             # TuShare Pro token
 ├── lib/                              # 第三方数据源（git submodule）
 │   └── baostock/
-├── src/
+├── src/                              # 核心模块
 │   ├── __init__.py
-│   ├── data_fetcher.py               # 核心数据获取模块
+│   ├── data_fetcher.py               # 数据获取模块（支持缓存）
+│   ├── data_normalizer.py            # 数据标准化模块
+│   ├── db_manager.py                 # MongoDB 管理模块
 │   └── utils.py                      # 通用工具函数
 ├── scripts/
-│   ├── fetch_stock_data.py           # 获取历史K线数据
-│   ├── fetch_realtime_data.py        # 获取实时行情
-│   ├── fetch_financial_data.py       # 获取财务报表
-│   └── update_stock_pool.py          # 更新股票池列表
-├── tests/
-│   ├── test_data_fetcher.py          # 数据获取模块单元测试
-│   ├── test_utils.py                 # 工具函数单元测试
-│   └── test_submodules.py            # 集成测试（需网络）
-├── data/
-│   ├── raw/                          # 原始数据
-│   │   ├── daily/
-│   │   ├── realtime/
-│   │   └── financial/
-│   └── processed/
-├── notebooks/
-└── output/
+│   ├── common/                       # 通用脚本（参数化，适用于任意股票）
+│   │   ├── fetch_stock_data.py       #   获取历史K线数据
+│   │   ├── fetch_realtime_data.py    #   获取实时行情
+│   │   ├── fetch_financial_data.py   #   获取财务报表
+│   │   └── update_stock_pool.py      #   更新股票池列表
+│   └── stocks/                       # 针对特定股票的分析脚本
+│       └── <股票ID>/                 #   按股票代码组织
+└── tests/                            # 单元测试与集成测试
+    ├── test_data_fetcher.py
+    ├── test_data_normalizer.py
+    ├── test_db_manager.py
+    ├── test_utils.py
+    └── test_submodules.py
 ```
 
 ## 测试

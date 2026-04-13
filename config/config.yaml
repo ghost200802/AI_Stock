@@ -8,14 +8,6 @@ data_source:
   baostock:
     adjust: "3"        # 默认复权方式: 1(后复权) / 2(前复权) / 3(前复权，且采用最新财务数据)
 
-# 数据存储路径
-paths:
-  raw_daily: "data/raw/daily"
-  raw_realtime: "data/raw/realtime"
-  raw_financial: "data/raw/financial"
-  processed: "data/processed"
-  stock_pool: "data/stock_pool.csv"
-
 # 默认日期范围
 default_dates:
   start: "2020-01-01"
@@ -28,6 +20,12 @@ stock_pool:
   - "000858"  # 五粮液
   - "601318"  # 中国平安
   - "600519"  # 贵州茅台
+
+# MongoDB 配置
+mongodb:
+  host: "localhost"
+  port: 27017
+  database: "DB_Stock"
 
 # 输出格式
 output:

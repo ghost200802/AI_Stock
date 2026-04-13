@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 import yaml
 
-from src.utils import (
+from lib.utils import (
     ensure_dir,
     format_stock_code,
     get_project_root,
@@ -20,13 +20,15 @@ class TestLoadConfig:
         config = load_config()
         assert isinstance(config, dict)
         assert "data_source" in config
+        assert "mongodb" in config
+        assert config["mongodb"]["database"] == "DB_Stock"
 
     def test_load_config_custom_path(self):
         config = load_config()
         assert isinstance(config, dict)
 
     def test_load_config_not_found(self):
-        with pytest.raises(FileNotFoundError, match="配置文件不存在"):
+        with pytest.raises(FileNotFoundError, match="配置文件不存�?):
             load_config("/nonexistent/path/config.yaml")
 
 
@@ -50,18 +52,20 @@ class TestEnsureDir:
 
 
 class TestSaveData:
-    def test_save_csv(self, tmp_path):
+    def test_save_csv_deprecated(self, tmp_path):
         df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
         filepath = tmp_path / "test.csv"
-        save_data(df, filepath, format="csv")
+        with pytest.warns(DeprecationWarning, match="save_data 已弃�?):
+            save_data(df, filepath, format="csv")
         assert filepath.exists()
         loaded = pd.read_csv(filepath)
         pd.testing.assert_frame_equal(loaded, df)
 
-    def test_save_parquet(self, tmp_path):
+    def test_save_parquet_deprecated(self, tmp_path):
         df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
         filepath = tmp_path / "test.parquet"
-        save_data(df, filepath, format="parquet")
+        with pytest.warns(DeprecationWarning, match="save_data 已弃�?):
+            save_data(df, filepath, format="parquet")
         assert filepath.exists()
         loaded = pd.read_parquet(filepath)
         pd.testing.assert_frame_equal(loaded, df)
@@ -69,8 +73,9 @@ class TestSaveData:
     def test_save_unsupported_format(self, tmp_path):
         df = pd.DataFrame({"a": [1]})
         filepath = tmp_path / "test.xlsx"
-        with pytest.raises(ValueError, match="不支持的格式"):
-            save_data(df, filepath, format="xlsx")
+        with pytest.warns(DeprecationWarning, match="save_data 已弃�?):
+            with pytest.raises(ValueError, match="不支持的格式"):
+                save_data(df, filepath, format="xlsx")
 
 
 class TestFormatStockCode:
@@ -104,7 +109,7 @@ class TestFormatStockCode:
         assert format_stock_code(symbol, source) == expected
 
     def test_unsupported_source(self):
-        with pytest.raises(ValueError, match="不支持的数据源"):
+        with pytest.raises(ValueError, match="不支持的数据�?):
             format_stock_code("000001", "akshare")
 
     def test_strip_whitespace(self):

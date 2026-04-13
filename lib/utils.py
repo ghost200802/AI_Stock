@@ -1,9 +1,12 @@
-import os
+import logging
+import warnings
 from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
 import yaml
+
+logger = logging.getLogger(__name__)
 
 
 def get_project_root():
@@ -28,6 +31,12 @@ def ensure_dir(filepath):
 
 
 def save_data(df, filepath, format="csv", encoding="utf-8-sig"):
+    warnings.warn(
+        "save_data 已弃用，数据存储已迁移到 MongoDB，请使用 DataFetcher.get_stock_data()",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    logger.warning("save_data 已弃用，数据存储已迁移到 MongoDB")
     filepath = Path(filepath)
     ensure_dir(filepath)
     if format == "csv":
