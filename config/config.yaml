@@ -31,3 +31,14 @@ mongodb:
 output:
   format: "csv"        # 默认输出格式: csv / parquet
   encoding: "utf-8-sig"  # CSV编码，utf-8-sig 可在Excel中正确显示中文
+
+# 可视化配置
+visualizer:
+  default_period: "daily"
+  available_periods: ["daily", "weekly", "monthly"]
+  default_date_range_days: 365
+  overlays:
+    chanlun: true
+    caisen: true
+    ma_lines: [5, 20, 60, 120, 250]
+  theme: "streamlit"

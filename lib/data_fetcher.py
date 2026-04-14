@@ -5,7 +5,7 @@ import baostock as bs
 import pandas as pd
 import tushare as ts
 
-from .data_normalizer import normalize_daily
+from .data_normalizer import TUSHARE_FIELD_MAP, normalize_daily
 from .db_manager import DBManager
 from .utils import get_project_root, load_config, parse_date
 
@@ -98,7 +98,7 @@ class DataFetcher:
             new_df = self._fetch_from_api(symbol, data_type, start_date, end_date, source)
             if not new_df.empty:
                 self._save_to_cache(collection, new_df, ts_code, data_type, source)
-            return self.db_manager.find_to_dataframe(collection, query, sort=[("trade_date", 1)])
+            return self._fix_cache_columns(self.db_manager.find_to_dataframe(collection, query, sort=[("trade_date", 1)]))
 
         latest_date = cached_df["trade_date"].max()
         latest_date_fmt = latest_date.replace("-", "")
@@ -110,10 +110,23 @@ class DataFetcher:
             new_df = self._fetch_from_api(symbol, data_type, next_date, end_date, source)
             if not new_df.empty:
                 self._save_to_cache(collection, new_df, ts_code, data_type, source)
-            return self.db_manager.find_to_dataframe(collection, query, sort=[("trade_date", 1)])
+            return self._fix_cache_columns(self.db_manager.find_to_dataframe(collection, query, sort=[("trade_date", 1)]))
 
         logger.info("本地缓存完整，直接返回 %s %s 数据 (%d 条, source=%s)", symbol, data_type, len(cached_df), source)
-        return cached_df
+        return self._fix_cache_columns(cached_df)
+
+    def _fix_cache_columns(self, df):
+        if df.empty:
+            return df
+        col_map = {}
+        for col in df.columns:
+            normalized = TUSHARE_FIELD_MAP.get(col)
+            if normalized and normalized not in df.columns:
+                col_map[col] = normalized
+        if col_map:
+            logger.info("缓存数据列名修复: %s", col_map)
+            df = df.rename(columns=col_map)
+        return df
 
     def _save_to_cache(self, collection, df, ts_code, data_type, source):
         if df.empty:
@@ -343,8 +356,10 @@ class DataFetcher:
             for ts_code, group in grouped:
                 symbol = ts_code.split(".")[0]
                 collection = self._collection_name(symbol)
+                group = normalize_daily(group, self.default_source)
                 records = group.to_dict("records")
                 for rec in records:
+                    rec["ts_code"] = ts_code
                     rec["data_type"] = "daily"
                     rec["source"] = self.default_source
                 self.db_manager.upsert_many(collection, records)

@@ -424,7 +424,7 @@ class TestContextManager:
 
 class TestUnsupportedSource:
     def test_fetch_stock_history_unsupported(self, fetcher_no_cache):
-        with pytest.raises(ValueError, match="不支持的数据�?):
+        with pytest.raises(ValueError, match="不支持的数据源"):
             fetcher_no_cache.fetch_stock_history("000001", source="akshare")
 
     def test_unsupported_data_type(self, fetcher_no_cache):

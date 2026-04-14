@@ -28,7 +28,7 @@ class TestLoadConfig:
         assert isinstance(config, dict)
 
     def test_load_config_not_found(self):
-        with pytest.raises(FileNotFoundError, match="配置文件不存�?):
+        with pytest.raises(FileNotFoundError, match="配置文件不存在"):
             load_config("/nonexistent/path/config.yaml")
 
 
@@ -37,7 +37,7 @@ class TestGetProjectRoot:
         root = get_project_root()
         assert root.exists()
         assert (root / "config" / "config.yaml").exists()
-        assert (root / "src").exists()
+        assert (root / "lib").exists()
 
 
 class TestEnsureDir:
@@ -55,7 +55,7 @@ class TestSaveData:
     def test_save_csv_deprecated(self, tmp_path):
         df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
         filepath = tmp_path / "test.csv"
-        with pytest.warns(DeprecationWarning, match="save_data 已弃�?):
+        with pytest.warns(DeprecationWarning, match="save_data 已弃用"):
             save_data(df, filepath, format="csv")
         assert filepath.exists()
         loaded = pd.read_csv(filepath)
@@ -64,7 +64,7 @@ class TestSaveData:
     def test_save_parquet_deprecated(self, tmp_path):
         df = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
         filepath = tmp_path / "test.parquet"
-        with pytest.warns(DeprecationWarning, match="save_data 已弃�?):
+        with pytest.warns(DeprecationWarning, match="save_data 已弃用"):
             save_data(df, filepath, format="parquet")
         assert filepath.exists()
         loaded = pd.read_parquet(filepath)
@@ -73,7 +73,7 @@ class TestSaveData:
     def test_save_unsupported_format(self, tmp_path):
         df = pd.DataFrame({"a": [1]})
         filepath = tmp_path / "test.xlsx"
-        with pytest.warns(DeprecationWarning, match="save_data 已弃�?):
+        with pytest.warns(DeprecationWarning, match="save_data 已弃用"):
             with pytest.raises(ValueError, match="不支持的格式"):
                 save_data(df, filepath, format="xlsx")
 
@@ -109,7 +109,7 @@ class TestFormatStockCode:
         assert format_stock_code(symbol, source) == expected
 
     def test_unsupported_source(self):
-        with pytest.raises(ValueError, match="不支持的数据�?):
+        with pytest.raises(ValueError, match="不支持的数据源"):
             format_stock_code("000001", "akshare")
 
     def test_strip_whitespace(self):

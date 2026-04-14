@@ -51,7 +51,7 @@ class TestDBManagerInit:
                 mock_client.admin.command = MagicMock(side_effect=ConnectionFailure("connection refused"))
                 mock_client_cls.return_value = mock_client
 
-                with pytest.raises(ConnectionFailure, match="无法连接�?MongoDB"):
+                with pytest.raises(ConnectionFailure, match="无法连接到 MongoDB"):
                     DBManager()
 
     def test_init_default_config(self):

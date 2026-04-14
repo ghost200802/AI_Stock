@@ -36,7 +36,7 @@ class TestBaoStockPackage:
         while rs.error_code == "0" and rs.next():
             rows.append(rs.get_row_data())
         df = pd.DataFrame(rows, columns=rs.fields)
-        assert not df.empty, "sh.601398 日K线数据为�?
+        assert not df.empty, "sh.601398 日K线数据为空
         assert "date" in df.columns
         assert "close" in df.columns
 
@@ -46,10 +46,10 @@ class TestBaoStockPackage:
         while rs.error_code == "0" and rs.next():
             rows.append(rs.get_row_data())
         df = pd.DataFrame(rows, columns=rs.fields)
-        assert not df.empty, "利润表数据为�?
+        assert not df.empty, "利润表数据为空
         expected_fields = ["code", "pubDate", "statDate"]
         for field in expected_fields:
-            assert field in rs.fields, f"利润表缺少字�? {field}"
+            assert field in rs.fields, f"利润表缺少字段 {field}"
 
 
 class TestTusharePackage:
@@ -80,8 +80,8 @@ class TestTusharePackage:
         pro = ts.pro_api(token)
         df = pro.stock_basic(exchange="", list_status="L", fields="ts_code,symbol,name")
         assert df is not None and not df.empty, "股票列表为空"
-        assert "symbol" in df.columns, "缺少'symbol'�?
-        assert "name" in df.columns, "缺少'name'�?
+        assert "symbol" in df.columns, "缺少'symbol'列
+        assert "name" in df.columns, "缺少'name'列
 
     def test_daily(self):
         import tushare as ts
@@ -97,5 +97,5 @@ class TestTusharePackage:
         pro = ts.pro_api(token)
         df = pro.daily(ts_code="000001.SZ", start_date="20250101", end_date="20250110")
         assert df is not None and not df.empty, "000001.SZ 日线数据为空"
-        assert "trade_date" in df.columns, "缺少'trade_date'�?
-        assert "close" in df.columns, "缺少'close'�?
+        assert "trade_date" in df.columns, "缺少'trade_date'列
+        assert "close" in df.columns, "缺少'close'列
