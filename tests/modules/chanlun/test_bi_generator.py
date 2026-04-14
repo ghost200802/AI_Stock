@@ -35,10 +35,10 @@ class TestSimpleBiGeneration:
     def test_top_bottom_alternating(self):
         fractals = [
             _make_fractal(FractalType.TOP, 2, 20, 15, "2024-01-03"),
-            _make_fractal(FractalType.BOTTOM, 5, 12, 8, "2024-01-06"),
-            _make_fractal(FractalType.TOP, 8, 18, 14, "2024-01-09"),
+            _make_fractal(FractalType.BOTTOM, 8, 12, 8, "2024-01-09"),
+            _make_fractal(FractalType.TOP, 14, 18, 14, "2024-01-15"),
         ]
-        klines = _make_klines(10, base_high=25, base_low=5)
+        klines = _make_klines(18, base_high=25, base_low=5)
 
         gen = BiGenerator()
         bis = gen.generate(fractals, klines)
@@ -50,10 +50,10 @@ class TestSimpleBiGeneration:
     def test_bottom_top_alternating(self):
         fractals = [
             _make_fractal(FractalType.BOTTOM, 2, 12, 8, "2024-01-03"),
-            _make_fractal(FractalType.TOP, 5, 20, 15, "2024-01-06"),
-            _make_fractal(FractalType.BOTTOM, 8, 12, 6, "2024-01-09"),
+            _make_fractal(FractalType.TOP, 8, 20, 15, "2024-01-09"),
+            _make_fractal(FractalType.BOTTOM, 14, 12, 6, "2024-01-15"),
         ]
-        klines = _make_klines(10, base_high=25, base_low=5)
+        klines = _make_klines(18, base_high=25, base_low=5)
 
         gen = BiGenerator()
         bis = gen.generate(fractals, klines)
@@ -80,9 +80,9 @@ class TestDistanceCheck:
     def test_exactly_min_distance(self):
         fractals = [
             _make_fractal(FractalType.TOP, 2, 20, 15, "2024-01-03"),
-            _make_fractal(FractalType.BOTTOM, 4, 12, 8, "2024-01-05"),
+            _make_fractal(FractalType.BOTTOM, 6, 12, 8, "2024-01-07"),
         ]
-        klines = _make_klines(6, base_high=25, base_low=5)
+        klines = _make_klines(10, base_high=25, base_low=5)
 
         gen = BiGenerator()
         bis = gen.generate(fractals, klines)
@@ -95,9 +95,9 @@ class TestPriceChange:
     def test_price_change_calculation(self):
         fractals = [
             _make_fractal(FractalType.BOTTOM, 2, 12, 8, "2024-01-03"),
-            _make_fractal(FractalType.TOP, 5, 20, 15, "2024-01-06"),
+            _make_fractal(FractalType.TOP, 8, 20, 15, "2024-01-09"),
         ]
-        klines = _make_klines(7, base_high=25, base_low=5)
+        klines = _make_klines(12, base_high=25, base_low=5)
 
         gen = BiGenerator()
         bis = gen.generate(fractals, klines)
@@ -112,10 +112,10 @@ class TestConfirmedFlag:
     def test_last_bi_unconfirmed(self):
         fractals = [
             _make_fractal(FractalType.BOTTOM, 2, 12, 8, "2024-01-03"),
-            _make_fractal(FractalType.TOP, 5, 20, 15, "2024-01-06"),
-            _make_fractal(FractalType.BOTTOM, 8, 12, 6, "2024-01-09"),
+            _make_fractal(FractalType.TOP, 8, 20, 15, "2024-01-09"),
+            _make_fractal(FractalType.BOTTOM, 14, 12, 6, "2024-01-15"),
         ]
-        klines = _make_klines(10, base_high=25, base_low=5)
+        klines = _make_klines(18, base_high=25, base_low=5)
 
         gen = BiGenerator()
         bis = gen.generate(fractals, klines)
@@ -248,10 +248,10 @@ class TestDistanceCheckNoUpdate:
     def test_distance_skip_updates_prev(self):
         fractals = [
             _make_fractal(FractalType.TOP, 2, 20, 15, "2024-01-03"),
-            _make_fractal(FractalType.BOTTOM, 3, 12, 8, "2024-01-04"),
-            _make_fractal(FractalType.BOTTOM, 5, 14, 6, "2024-01-06"),
+            _make_fractal(FractalType.BOTTOM, 4, 12, 8, "2024-01-05"),
+            _make_fractal(FractalType.BOTTOM, 8, 14, 6, "2024-01-09"),
         ]
-        klines = _make_klines(10, base_high=25, base_low=5)
+        klines = _make_klines(12, base_high=25, base_low=5)
 
         gen = BiGenerator()
         bis = gen.generate(fractals, klines)
@@ -259,7 +259,7 @@ class TestDistanceCheckNoUpdate:
         assert len(bis) == 1
         assert bis[0].direction == BiDirection.DOWN
         assert bis[0].start_index == 2
-        assert bis[0].end_index == 5
+        assert bis[0].end_index == 8
 
 
 class TestEndToEndWithConsecutiveSameType:

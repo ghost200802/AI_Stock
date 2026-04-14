@@ -57,9 +57,9 @@ class IncludeProcessor:
         if len(result) >= 2:
             first = result[-2]
             second = result[-1]
-            if first.high > second.high:
+            if second.high > first.high:
                 return "up"
-            elif first.high < second.high:
+            elif second.high < first.high:
                 return "down"
 
         if result[0].close >= result[0].open:

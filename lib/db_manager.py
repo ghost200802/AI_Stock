@@ -42,9 +42,14 @@ class DBManager:
 
     def _ensure_index(self, collection_name):
         collection = self._db[collection_name]
+        idx_name = "ts_code_1_data_type_1_trade_date_1"
+        existing = collection.index_information()
+        if idx_name in existing:
+            collection.drop_index(idx_name)
         collection.create_index(
             [("ts_code", 1), ("data_type", 1), ("trade_date", 1)],
             unique=True,
+            partialFilterExpression={"trade_date": {"$exists": True}},
             background=True,
         )
         collection.create_index(

@@ -76,9 +76,16 @@ def _results_to_dataframe(results: list) -> pd.DataFrame:
 
         kp_dates = []
         kp_prices = []
+        kp_list = []
         for kp in r.key_points:
             kp_dates.append(kp.date)
             kp_prices.append(kp.price)
+            kp_list.append({
+                "name": kp.name,
+                "date": str(kp.date)[:10] if kp.date is not None else None,
+                "price": kp.price,
+                "bi_index": kp.bi_index,
+            })
 
         neck_start = r.key_points[0].date if r.key_points else None
         neck_end = r.key_points[1].date if len(r.key_points) > 1 else None
@@ -102,6 +109,7 @@ def _results_to_dataframe(results: list) -> pd.DataFrame:
             "stop_loss_date": stop_loss_date,
             "key_point_date": key_point_date,
             "key_point_price": key_point_price,
+            "key_points": kp_list,
             "confidence": r.confidence,
             "start_date": r.start_date,
             "end_date": r.end_date,

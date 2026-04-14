@@ -25,6 +25,8 @@ class Bi:
 
 class BiGenerator:
 
+    MIN_FRACTAL_GAP = 4
+
     def __init__(self, min_independent_klines: int = 1):
         self.min_independent_klines = min_independent_klines
 
@@ -42,16 +44,15 @@ class BiGenerator:
         if len(resolved) < 2:
             return []
 
+        valid_fractals = self._filter_by_distance_and_relation(resolved)
+
+        if len(valid_fractals) < 2:
+            return []
+
         bis = []
-        prev = resolved[0]
-
-        for i in range(1, len(resolved)):
-            curr = resolved[i]
-
-            if not self._check_distance(prev, curr, processed_klines):
-                prev = curr
-                continue
-
+        for i in range(1, len(valid_fractals)):
+            prev = valid_fractals[i - 1]
+            curr = valid_fractals[i]
             direction = self._determine_direction(prev, curr)
 
             bi = Bi(
@@ -65,14 +66,61 @@ class BiGenerator:
                 confirmed=True,
             )
             bis.append(bi)
-            prev = curr
-
-        bis = self._ensure_alternating_direction(bis, resolved)
 
         if bis:
             bis[-1].confirmed = False
 
         return bis
+
+    def _filter_by_distance_and_relation(self, fractals: List) -> List:
+        from .fractal_detector import FractalType
+
+        if not fractals:
+            return []
+
+        result = [fractals[0]]
+
+        for i in range(1, len(fractals)):
+            f = fractals[i]
+            last = result[-1]
+
+            if f.fractal_type == last.fractal_type:
+                if f.fractal_type == FractalType.TOP:
+                    if f.high > last.high:
+                        result[-1] = f
+                elif f.fractal_type == FractalType.BOTTOM:
+                    if f.low < last.low:
+                        result[-1] = f
+                continue
+
+            gap = f.index - last.index
+            if gap >= self.MIN_FRACTAL_GAP and self._check_price_relation(last, f):
+                result.append(f)
+                continue
+
+            if len(result) >= 2 and result[-2].fractal_type == f.fractal_type:
+                same_type_prev = result[-2]
+                is_more_extreme = False
+                if f.fractal_type == FractalType.TOP and f.high > same_type_prev.high:
+                    is_more_extreme = True
+                elif f.fractal_type == FractalType.BOTTOM and f.low < same_type_prev.low:
+                    is_more_extreme = True
+
+                if is_more_extreme:
+                    gap_to_prev = f.index - same_type_prev.index
+                    if gap_to_prev >= self.MIN_FRACTAL_GAP:
+                        result.pop(-1)
+                        result[-1] = f
+
+        return result
+
+    @staticmethod
+    def _check_price_relation(prev, curr) -> bool:
+        from .fractal_detector import FractalType
+
+        top = prev if prev.fractal_type == FractalType.TOP else curr
+        bottom = curr if curr.fractal_type == FractalType.BOTTOM else prev
+        return top.high > bottom.high and bottom.low < top.low
 
     @staticmethod
     def _merge_consecutive_same_type(fractals: List) -> List:

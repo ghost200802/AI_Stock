@@ -28,7 +28,6 @@ class FractalDetector:
 
         raw_fractals = self._find_fractals(processed_klines)
         filtered = self._filter_consecutive_same_type(raw_fractals, processed_klines)
-        filtered = self._filter_by_distance_and_alternation(filtered)
         return filtered
 
     def _find_fractals(self, klines: List) -> List[Fractal]:

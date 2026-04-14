@@ -41,7 +41,30 @@ def compute_bi(kline_df: pd.DataFrame) -> pd.DataFrame:
     bi_generator = BiGenerator()
     bis = bi_generator.generate(fractals, processed_klines)
 
-    return _convert_to_overlay_df(fractals, bis, kline_df)
+    valid_fractals = _extract_valid_fractals(fractals, bis)
+
+    return _convert_to_overlay_df(valid_fractals, bis, kline_df)
+
+
+def _extract_valid_fractals(fractals: list, bis: list) -> list:
+    if not bis:
+        return []
+
+    fractal_map = {}
+    for f in fractals:
+        key = (f.trade_date, f.fractal_type)
+        fractal_map[key] = f
+
+    valid = []
+    for b in bis:
+        start_key = (b.start_date, FractalType.TOP if b.direction == BiDirection.DOWN else FractalType.BOTTOM)
+        end_key = (b.end_date, FractalType.BOTTOM if b.direction == BiDirection.DOWN else FractalType.TOP)
+        if start_key in fractal_map and fractal_map[start_key] not in valid:
+            valid.append(fractal_map[start_key])
+        if end_key in fractal_map and fractal_map[end_key] not in valid:
+            valid.append(fractal_map[end_key])
+
+    return valid
 
 
 def _convert_to_overlay_df(

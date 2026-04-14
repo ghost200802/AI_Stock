@@ -114,7 +114,12 @@ class ChartDataCache:
                         rec["ts_code"] = ts_code
                         rec["data_type"] = f"caisen_{period}"
                     collection = f"stock_{symbol}"
-                    self.db_manager.upsert_many(collection, records)
+                    coll = self.db_manager.get_collection(collection)
+                    coll.delete_many({
+                        "ts_code": ts_code,
+                        "data_type": f"caisen_{period}",
+                    })
+                    self.db_manager.insert_many(collection, records)
                     return result_df
         except (ImportError, AttributeError):
             logger.debug("分析模块 %s 尚未实现或缺少入口函数", analysis_type)
