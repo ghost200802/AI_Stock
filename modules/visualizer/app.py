@@ -14,6 +14,7 @@ from modules.visualizer.data_cache import ChartDataCache
 from modules.visualizer.chart_kline import create_kline_chart, PERIOD_LABELS
 from modules.visualizer.overlays import MAOverlay, ChanlunOverlay, CaisenOverlay
 from modules.visualizer.panels.pattern_panel import render_pattern_panel
+from modules.visualizer.panels.chanlun_panel import render_chanlun_panel
 
 logger = logging.getLogger(__name__)
 
@@ -166,8 +167,15 @@ def main():
             st.error(f"获取形态数据失败: {e}")
             logger.exception("获取形态数据失败")
             patterns_df = pd.DataFrame()
+            chanlun_df = pd.DataFrame()
 
-    render_pattern_panel(patterns_df)
+    col_left, col_right = st.columns(2)
+
+    with col_left:
+        render_pattern_panel(patterns_df)
+
+    with col_right:
+        render_chanlun_panel(chanlun_df)
 
 
 if __name__ == "__main__":

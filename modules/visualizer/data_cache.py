@@ -74,18 +74,34 @@ class ChartDataCache:
         try:
             if analysis_type == "chanlun":
                 from modules.chanlun import compute_bi
+                from modules.chanlun.cache_manager import ChanLunCacheManager
+                from modules.chanlun.include_processor import IncludeProcessor
+                from modules.chanlun.fractal_detector import FractalDetector
+                from modules.chanlun.bi_generator import BiGenerator
+
                 kline_df = self.get_kline_data(symbol, period)
                 if kline_df.empty:
                     return None
+
+                include_processor = IncludeProcessor()
+                processed_klines = include_processor.process(kline_df)
+
+                fractal_detector = FractalDetector()
+                fractals = fractal_detector.detect(processed_klines)
+
+                bi_generator = BiGenerator()
+                bis = bi_generator.generate(fractals, processed_klines)
+
+                collection = f"stock_{symbol}"
+                chanlun_cache = ChanLunCacheManager(self.db_manager)
+                chanlun_cache.ensure_indexes(collection)
+                chanlun_cache.save_fractals(collection, ts_code, period, fractals)
+                chanlun_cache.save_bis(collection, ts_code, period, bis)
+
                 result_df = compute_bi(kline_df)
                 if result_df is not None and not result_df.empty:
-                    records = result_df.to_dict("records")
-                    for rec in records:
-                        rec["ts_code"] = ts_code
-                        rec["data_type"] = f"chanlun_{period}"
-                    collection = f"stock_{symbol}"
-                    self.db_manager.upsert_many(collection, records)
                     return result_df
+                return None
             elif analysis_type == "caisen":
                 from modules.caisen import compute_patterns
                 kline_df = self.get_kline_data(symbol, period)

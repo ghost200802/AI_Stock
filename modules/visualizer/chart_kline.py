@@ -102,12 +102,14 @@ def create_kline_chart(df, overlays=None, title="", period="daily"):
     fig.update_xaxes(
         row=1,
         col=1,
+        type="category",
         rangeslider_visible=False,
         gridcolor="#f0f0f0",
     )
     fig.update_xaxes(
         row=2,
         col=1,
+        type="category",
         gridcolor="#f0f0f0",
     )
     fig.update_yaxes(

@@ -1,5 +1,6 @@
 import logging
 
+import pandas as pd
 import plotly.graph_objects as go
 
 from .base import ChartOverlay
@@ -44,16 +45,18 @@ class ChanlunOverlay(ChartOverlay):
         except Exception as e:
             logger.error("缠论叠加层绘制失败: %s", e)
 
+    def _normalize_date(self, val):
+        if val is None or (isinstance(val, float) and pd.isna(val)):
+            return None
+        if isinstance(val, str):
+            return val[:10]
+        if hasattr(val, "strftime"):
+            return val.strftime("%Y-%m-%d")
+        return str(val)
+
     def _draw_fractal_points(self, fig, bi_df, kline_df):
         if "fractal_type" not in bi_df.columns:
             return
-
-        date_map = {}
-        if "trade_date" in kline_df.columns:
-            for _, row in kline_df.iterrows():
-                dt = row["trade_date"]
-                if hasattr(dt, "strftime"):
-                    date_map[row["trade_date"]] = row
 
         top_points = bi_df[bi_df["fractal_type"] == "top"]
         bottom_points = bi_df[bi_df["fractal_type"] == "bottom"]
@@ -61,7 +64,7 @@ class ChanlunOverlay(ChartOverlay):
         if not top_points.empty:
             fig.add_trace(
                 go.Scatter(
-                    x=top_points.get("trade_date", []),
+                    x=[self._normalize_date(d) for d in top_points.get("trade_date", [])],
                     y=top_points.get("price", []),
                     mode="markers",
                     marker=dict(symbol="triangle-down", size=10, color="red"),
@@ -74,7 +77,7 @@ class ChanlunOverlay(ChartOverlay):
         if not bottom_points.empty:
             fig.add_trace(
                 go.Scatter(
-                    x=bottom_points.get("trade_date", []),
+                    x=[self._normalize_date(d) for d in bottom_points.get("trade_date", [])],
                     y=bottom_points.get("price", []),
                     mode="markers",
                     marker=dict(symbol="triangle-up", size=10, color="green"),
@@ -101,7 +104,7 @@ class ChanlunOverlay(ChartOverlay):
                 for _, row in direction.iterrows():
                     fig.add_trace(
                         go.Scatter(
-                            x=[row["start_date"], row["end_date"]],
+                            x=[self._normalize_date(row["start_date"]), self._normalize_date(row["end_date"])],
                             y=[row["start_price"], row["end_price"]],
                             mode="lines",
                             line=dict(width=2, color=color),
